@@ -1,0 +1,910 @@
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_empty_k",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        256,
+        0
+    ],
+    "x2_shape": [
+        0,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        256,
+        8192
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000000009
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_bfloat16",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        8192,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        12288
+    ],
+    "bias_shape": [
+        12288
+    ],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_support_3_dim",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        1,
+        8192,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        12288
+    ],
+    "bias_shape": [
+        12288
+    ],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        1,
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_5",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        256,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_4",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        1024,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_3",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        128,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_2",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        8192,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        12288
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": true,
+    "is_trans_b": true,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_mcut_float16_910B_win2win",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        12290,
+        15360
+    ],
+    "x2_shape": [
+        15360,
+        12288
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        12290,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_big_K",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        8192,
+        268435455
+    ],
+    "x2_shape": [
+        268435455,
+        12288
+    ],
+    "bias_shape": [],
+    "x3_shape": [
+        8192,
+        12288
+    ],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 65536
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_big_N",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        8192,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        268435455
+    ],
+    "bias_shape": [],
+    "x3_shape": [
+        8192,
+        268435455
+    ],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        268435455
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 65536
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_unaligned",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        1,
+        65536
+    ],
+    "x2_shape": [
+        65536,
+        128
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        1,
+        128
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_1_cube",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        8192,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        12288
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10000000000000001100
+}
+{
+    "inputTotalNum": 4,
+    "case_name": "matmul_all_reduce_test_tiling_float16_1",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        8192,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        12288
+    ],
+    "bias_shape": [],
+    "x3_shape": [
+        8192,
+        12288
+    ],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        8192,
+        12288
+    ],
+    "x1_dtype": "ge::DT_FLOAT16",
+    "x2_dtype": "ge::DT_FLOAT16",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT",
+    "antiquant_offset_dtype": "ge::DT_FLOAT",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 65536
+}
+{
+    "inputTotalNum": 8,
+    "case_name": "matmul_all_reduce_test_tiling_int8_bf16",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        256,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [
+        8192
+    ],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        256,
+        8192
+    ],
+    "x1_dtype": "ge::DT_INT8",
+    "x2_dtype": "ge::DT_INT8",
+    "bias_dtype": "ge::DT_BF16",
+    "x3_dtype": "ge::DT_BF16",
+    "antiquant_scale_dtype": "ge::DT_BF16",
+    "antiquant_offset_dtype": "ge::DT_BF16",
+    "dequant_scale_dtype": "ge::DT_BF16",
+    "pertoken_scale_dtype": "ge::DT_BF16",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_BF16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 0
+}
+{
+    "inputTotalNum": 8,
+    "case_name": "matmul_all_reduce_test_tiling_int8_1",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        256,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [
+        8192
+    ],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        256,
+        8192
+    ],
+    "x1_dtype": "ge::DT_INT8",
+    "x2_dtype": "ge::DT_INT8",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT16",
+    "antiquant_offset_dtype": "ge::DT_FLOAT16",
+    "dequant_scale_dtype": "ge::DT_UINT64",
+    "pertoken_scale_dtype": "ge::DT_FLOAT16",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 0
+}
+{
+    "inputTotalNum": 9,
+    "case_name": "matmul_all_reduce_test_tiling_int8_2",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        256,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [
+        1
+    ],
+    "pertoken_scale_shape": [
+        256
+    ],
+    "comm_quant_scale_1_shape": [],
+    "comm_quant_scale_2_shape": [],
+    "output_shape": [
+        256,
+        8192
+    ],
+    "x1_dtype": "ge::DT_INT8",
+    "x2_dtype": "ge::DT_INT8",
+    "bias_dtype": "ge::DT_FLOAT16",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT16",
+    "antiquant_offset_dtype": "ge::DT_FLOAT16",
+    "dequant_scale_dtype": "ge::DT_FLOAT",
+    "pertoken_scale_dtype": "ge::DT_FLOAT",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT16",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 16
+}
+{
+    "inputTotalNum": 10,
+    "case_name": "matmul_all_reduce_test_tiling_a8w8_910b_mCut_2",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        4096,
+        1024
+    ],
+    "x2_shape": [
+        1024,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [
+        8192
+    ],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [
+        8192
+    ],
+    "comm_quant_scale_2_shape": [
+        8192
+    ],
+    "output_shape": [
+        4096,
+        8192
+    ],
+    "x1_dtype": "ge::DT_INT8",
+    "x2_dtype": "ge::DT_INT8",
+    "bias_dtype": "ge::DT_INT32",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT16",
+    "antiquant_offset_dtype": "ge::DT_FLOAT16",
+    "dequant_scale_dtype": "ge::DT_UINT64",
+    "pertoken_scale_dtype": "ge::DT_UINT64",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT16",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT16",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10
+}
+{
+    "inputTotalNum": 10,
+    "case_name": "matmul_all_reduce_test_tiling_a8w8_910b_mCut_1",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        4096,
+        6272
+    ],
+    "x2_shape": [
+        6272,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [
+        8192
+    ],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [
+        8192
+    ],
+    "comm_quant_scale_2_shape": [
+        8192
+    ],
+    "output_shape": [
+        4096,
+        8192
+    ],
+    "x1_dtype": "ge::DT_INT8",
+    "x2_dtype": "ge::DT_INT8",
+    "bias_dtype": "ge::DT_INT32",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT16",
+    "antiquant_offset_dtype": "ge::DT_FLOAT16",
+    "dequant_scale_dtype": "ge::DT_UINT64",
+    "pertoken_scale_dtype": "ge::DT_UINT64",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT16",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT16",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10
+}
+{
+    "inputTotalNum": 10,
+    "case_name": "matmul_all_reduce_test_tiling_a8w8_scaleDimNum2_910b",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        256,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [
+        1,
+        8192
+    ],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [
+        1,
+        8192
+    ],
+    "comm_quant_scale_2_shape": [
+        1,
+        8192
+    ],
+    "output_shape": [
+        256,
+        8192
+    ],
+    "x1_dtype": "ge::DT_INT8",
+    "x2_dtype": "ge::DT_INT8",
+    "bias_dtype": "ge::DT_INT32",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT16",
+    "antiquant_offset_dtype": "ge::DT_FLOAT16",
+    "dequant_scale_dtype": "ge::DT_UINT64",
+    "pertoken_scale_dtype": "ge::DT_UINT64",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT16",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT16",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10
+}
+{
+    "inputTotalNum": 10,
+    "case_name": "matmul_all_reduce_test_tiling_a8w8_910b",
+    "compile_info": "{\"hardware_info\": {\"BT_SIZE\": 0, \"load3d_constraints\": \"1\", \"Intrinsic_fix_pipe_l0c2out\": false, \"Intrinsic_data_move_l12ub\": true, \"Intrinsic_data_move_l0c2ub\": true, \"Intrinsic_data_move_out2l1_nd2nz\": false, \"UB_SIZE\": 196608, \"L2_SIZE\": 33554432, \"L1_SIZE\": 524288, \"L0A_SIZE\": 65536, \"L0B_SIZE\": 65536, \"L0C_SIZE\": 131072, \"CORE_NUM\": 20, \"socVersion\": \"Ascend910B\"}}",
+    "soc_version": "Ascend910B",
+    "coreNum": 20,
+    "ubSize": 196608,
+    "tilingDataSize": 4096,
+    "x1_shape": [
+        256,
+        1536
+    ],
+    "x2_shape": [
+        1536,
+        8192
+    ],
+    "bias_shape": [],
+    "x3_shape": [],
+    "antiquant_scale_shape": [],
+    "antiquant_offset_shape": [],
+    "dequant_scale_shape": [
+        8192
+    ],
+    "pertoken_scale_shape": [],
+    "comm_quant_scale_1_shape": [
+        8192
+    ],
+    "comm_quant_scale_2_shape": [
+        8192
+    ],
+    "output_shape": [
+        256,
+        8192
+    ],
+    "x1_dtype": "ge::DT_INT8",
+    "x2_dtype": "ge::DT_INT8",
+    "bias_dtype": "ge::DT_INT32",
+    "x3_dtype": "ge::DT_FLOAT16",
+    "antiquant_scale_dtype": "ge::DT_FLOAT16",
+    "antiquant_offset_dtype": "ge::DT_FLOAT16",
+    "dequant_scale_dtype": "ge::DT_UINT64",
+    "pertoken_scale_dtype": "ge::DT_UINT64",
+    "comm_quant_scale_1_dtype": "ge::DT_FLOAT16",
+    "comm_quant_scale_2_dtype": "ge::DT_FLOAT16",
+    "output_dtype": "ge::DT_FLOAT16",
+    "is_trans_a": false,
+    "is_trans_b": false,
+    "expectTilingKey": 10
+}
