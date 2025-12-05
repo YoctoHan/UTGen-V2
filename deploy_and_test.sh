@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 脚本功能：将 target 目录下的测试文件复制到正确位置，编译并执行测试
+# 脚本功能：将 outputs 目录下的测试文件复制到正确位置，编译并执行测试
 # 使用方法: ./deploy_and_test.sh [--build-only] [--test-only]
 
 set -e
 
 # 配置路径
-UTGEN_TARGET_DIR="/workspace/UTGen-V2/target"
+UTGEN_TARGET_DIR="/workspace/UTGen-V2/outputs"
 OPS_TRANSFORMER_DIR="/workspace/ops-transformer-dev"
 MC2_DIR="${OPS_TRANSFORMER_DIR}/mc2"
 

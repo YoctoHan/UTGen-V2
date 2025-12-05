@@ -28,7 +28,13 @@ def create_initial_state(operator_name: OperatorName, operator_type: OpType) -> 
     - template_file_path: 当前工程下的模板输出路径
       例如: /workspace/UTGen-V2/template/all_gather_matmul.cpp
     - output_path: 当前工程下最终 UT 代码输出路径
-      例如: /workspace/UTGen-V2/target/test_all_gather_matmul_tiling.cpp
+      例如: /workspace/UTGen-V2/outputs/test_all_gather_matmul_tiling.cpp
+    
+    目录说明:
+    - template/: 存放由 generate_template.py 生成的代码骨架模板
+    - input/: 存放测试用例数据 (JSONL 格式)
+    - outputs/: 存放最终生成的测试文件
+    - target/: 存放 ground truth (期望输出，用于验证生成结果)
     """
     # ops-transformer 仓库中的 def.cpp
     op_name = operator_name.value
@@ -47,7 +53,7 @@ def create_initial_state(operator_name: OperatorName, operator_type: OpType) -> 
 
     # 模板和最终 UT 代码路径
     template_file_path = project_root / "template" / f"{op_name}.cpp"
-    output_path = project_root / "target" / f"test_{op_name}_tiling.cpp"
+    output_path = project_root / "outputs" / f"test_{op_name}_tiling.cpp"
 
     input_path = project_root / "input" / f"{op_name}.jsonl"
 
