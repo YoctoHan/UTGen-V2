@@ -42,7 +42,7 @@ def parse_op_def(src: str) -> Tuple[str, List[Tuple[str, str]], List[Tuple[str, 
 
     inputs = []
     for m in re.finditer(
-        r'this->Input\("(\w+)"\)\s*\n?\s*\.ParamType\((REQUIRED|OPTIONAL)\)',
+        r'this->Input\("(\w+)"\)\s*\n?\s*\.ParamType\((REQUIRED|OPTIONAL|DYNAMIC)\)',
         main_src,
         re.S,
     ):
@@ -54,7 +54,7 @@ def parse_op_def(src: str) -> Tuple[str, List[Tuple[str, str]], List[Tuple[str, 
     # 提取 Output
     outputs = []
     for m in re.finditer(
-        r'this->Output\("(\w+)"\)\s*\n?\s*\.ParamType\((REQUIRED|OPTIONAL)\)',
+        r'this->Output\("(\w+)"\)\s*\n?\s*\.ParamType\((REQUIRED|OPTIONAL|DYNAMIC)\)',
         main_src,
         re.S,
     ):
@@ -295,14 +295,10 @@ def gen_all_gather_matmul_like_code(op_class_name: str, inputs: List, outputs: L
         "comm_quant_scale_1", "comm_quant_scale_2",
     ]
 
-    # AllGatherMatmul 只使用这 5 个 attr（与源 UT 文件一致）
-    allowed_attrs = ["group", "is_trans_a", "is_trans_b", "gather_index", "comm_turn"]
-    
     # 构建 attr 列表代码
+    # 移除白名单限制，支持 V2 的更多属性
     attr_code_lines = []
     for attr_name, attr_type, attr_default in attrs:
-        if attr_name not in allowed_attrs:
-            continue
         if attr_type == "String":
             if attr_name == "group":
                 attr_code_lines.append(f'            {{"{attr_name}", build_from<std::string>("group")}}')
@@ -373,6 +369,7 @@ def gen_all_gather_matmul_like_code(op_class_name: str, inputs: List, outputs: L
     lines.append('    bool is_trans_b;')
     lines.append('')
     lines.append('    // 结果')
+    lines.append('    bool expectSuccess; // 是否期望 tiling 成功')
     lines.append('    uint64_t expectTilingKey;')
     lines.append('};')
     lines.append('')
@@ -426,18 +423,22 @@ def gen_all_gather_matmul_like_code(op_class_name: str, inputs: List, outputs: L
     lines.append('        },')
     lines.append('        &compileInfo, param.soc_version, param.compile_info, param.tilingDataSize);')
     lines.append('')
-    lines.append('    ExecuteTestCase(tilingContextPara, ge::GRAPH_SUCCESS, param.expectTilingKey);')
+    lines.append('    if (!param.expectSuccess) {')
+    lines.append('        Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};')
+    lines.append('        Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_FAILED, 0);')
+    lines.append('    } else {')
+    lines.append('        Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};')
+    lines.append('        Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_SUCCESS, param.expectTilingKey);')
+    lines.append('    }')
     lines.append('}')
     lines.append('')
     lines.append(f'TEST_P({param_class_name}, general_case)')
     lines.append('{')
-    lines.append('    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};')
-    lines.append('    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().SetValues(hcomTopologyMockValues);')
-    lines.append('')
+    lines.append('    if (!IsOpImplRegistryAvailable()) {')
+    lines.append('        GTEST_SKIP() << "Skip test: OpImplSpaceRegistryV2 is null on host.";')
+    lines.append('    }')
     lines.append('    const auto &param = GetParam();')
     lines.append('    TestOneParamCase(param);')
-    lines.append('')
-    lines.append('    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().Reset();')
     lines.append('}')
     lines.append('')
     lines.append('INSTANTIATE_TEST_SUITE_P(')
@@ -457,7 +458,7 @@ def gen_all_gather_matmul_like_code(op_class_name: str, inputs: List, outputs: L
     lines.append('} // anonymous namespace')
     lines.append('')
     lines.append(f'}} // namespace {namespace_name}')
-
+    
     return '\n'.join(lines)
 
 
@@ -579,6 +580,137 @@ def gen_distribute_barrier_like_code(op_class_name: str, inputs: List, outputs: 
     return '\n'.join(lines)
 
 
+def gen_general_op_code(op_class_name: str, inputs: List, outputs: List, attrs: List) -> str:
+    """通用算子 UT 代码生成"""
+    namespace_name = f"{op_class_name}UT"
+    struct_name = f"{op_class_name}TilingTestParam"
+    param_class_name = f"{op_class_name}TilingParam"
+    compile_info_name = f"{op_class_name}CompileInfo"
+
+    # Attr handling
+    attr_code_lines = []
+    for attr_name, attr_type, attr_default in attrs:
+        if attr_type == "String":
+             attr_code_lines.append(f'            {{"{attr_name}", build_from<std::string>(param.{attr_name})}}')
+        elif attr_type == "Int":
+            attr_code_lines.append(f'            {{"{attr_name}", build_from<int64_t>(param.{attr_name})}}')
+        elif attr_type == "Bool":
+            attr_code_lines.append(f'            {{"{attr_name}", build_from<bool>(param.{attr_name})}}')
+    attr_code = ",\n".join(attr_code_lines) + ","
+
+    lines = []
+    lines.append('/**')
+    lines.append(' * Copyright (c) 2025 Huawei Technologies Co., Ltd. All rights reserved.')
+    lines.append(' */')
+    lines.append('#include <iostream>')
+    lines.append('#include <vector>')
+    lines.append('#include <string>')
+    lines.append('#include <gtest/gtest.h>')
+    lines.append('#include "mc2_tiling_case_executor.h"')
+    lines.append('')
+    lines.append(f'namespace {namespace_name} {{')
+    lines.append('namespace {')
+    lines.append('template <typename T>')
+    lines.append('auto build_from(const T &value) { return Ops::Transformer::AnyValue::CreateFrom<T>(value); }')
+    lines.append('')
+    lines.append('gert::StorageShape make_shape(const std::initializer_list<int64_t> &input_shape)')
+    lines.append('{')
+    lines.append('    if (input_shape.size() == 0) { return gert::StorageShape{}; }')
+    lines.append('    return gert::StorageShape{input_shape, input_shape};')
+    lines.append('}')
+    lines.append('')
+    
+    # Struct definition
+    lines.append(f'struct {struct_name} {{')
+    lines.append('    std::string case_name;')
+    lines.append('    std::string compile_info;')
+    lines.append('    std::string soc_version;')
+    lines.append('    uint64_t coreNum;')
+    lines.append('    uint64_t ubSize;')
+    lines.append('    uint64_t tilingDataSize;')
+    lines.append('')
+    
+    # Input/Output shapes & dtypes
+    for name, _ in inputs:
+        lines.append(f'    std::initializer_list<int64_t> {name}_shape;')
+        lines.append(f'    ge::DataType {name}_dtype;')
+    for name, _ in outputs:
+        lines.append(f'    std::initializer_list<int64_t> {name}_shape;')
+        lines.append(f'    ge::DataType {name}_dtype;')
+    lines.append('')
+        
+    # Attrs
+    for attr_name, attr_type, _ in attrs:
+        if attr_type == "String":
+            lines.append(f'    std::string {attr_name};')
+        elif attr_type == "Int":
+            lines.append(f'    int64_t {attr_name};')
+        elif attr_type == "Bool":
+            lines.append(f'    bool {attr_name};')
+            
+    lines.append('    uint64_t expectTilingKey;')
+    lines.append('};')
+    lines.append('')
+
+    lines.append(f'class {param_class_name} : public ::testing::TestWithParam<{struct_name}> {{')
+    lines.append('protected:')
+    lines.append('    static void SetUpTestCase() { std::cout << "SetUp" << std::endl; }')
+    lines.append('    static void TearDownTestCase() { std::cout << "TearDown" << std::endl; }')
+    lines.append('};')
+    lines.append('')
+
+    lines.append(f'void TestOneParamCase(const {struct_name} &param)')
+    lines.append('{')
+    lines.append(f'    struct {compile_info_name} {{}} compileInfo;')
+    lines.append('')
+    
+    # Input List
+    lines.append('    std::vector<gert::TilingContextPara::TensorDescription> inputList;')
+    for name, _ in inputs:
+        lines.append(f'    inputList.push_back({{make_shape(param.{name}_shape), param.{name}_dtype, ge::FORMAT_ND}});')
+    lines.append('')
+
+    # Output List
+    lines.append('    std::vector<gert::TilingContextPara::TensorDescription> outputList;')
+    for name, _ in outputs:
+        lines.append(f'    outputList.push_back({{make_shape(param.{name}_shape), param.{name}_dtype, ge::FORMAT_ND}});')
+    lines.append('')
+
+    lines.append(f'    gert::TilingContextPara tilingContextPara("{op_class_name}", inputList, outputList,')
+    lines.append('        {')
+    lines.append(attr_code)
+    lines.append('        },')
+    lines.append('        &compileInfo, param.soc_version, param.compile_info, param.tilingDataSize);')
+    lines.append('')
+    lines.append('    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};')
+    lines.append('    Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_SUCCESS, param.expectTilingKey);')
+    lines.append('}')
+    lines.append('')
+
+    lines.append(f'TEST_P({param_class_name}, general_case)')
+    lines.append('{')
+    lines.append('    const auto &param = GetParam();')
+    lines.append('    TestOneParamCase(param);')
+    lines.append('}')
+    lines.append('')
+    
+    # Instantiate macro
+    lines.append('INSTANTIATE_TEST_SUITE_P(')
+    lines.append('    general_cases_params,')
+    lines.append(f'    {param_class_name},')
+    lines.append('    ::testing::ValuesIn(cases_params),')
+    lines.append(f'    [](const ::testing::TestParamInfo<{struct_name}> &info) {{')
+    lines.append('        std::string name = info.param.case_name;')
+    lines.append('        for (char &c : name) { if (!std::isalnum(static_cast<unsigned char>(c)) && c != \'_\') c = \'_\'; }')
+    lines.append('        return name;')
+    lines.append('    });')
+    
+    lines.append('} // anonymous namespace')
+    lines.append(f'}} // namespace {namespace_name}')
+    
+    return '\n'.join(lines)
+
+
 def _generate_template_core(def_path: Path, out_path: Path) -> None:
     """
     核心生成逻辑：
@@ -603,9 +735,12 @@ def _generate_template_core(def_path: Path, out_path: Path) -> None:
     elif is_mc2_matmul_like(attrs):
         print("  类型: MC2 Matmul 类算子")
         code = gen_mc2_matmul_like_code(op_class_name, inputs, outputs, attrs)
-    else:
+    elif "DistributeBarrier" in op_class_name:
         print("  类型: DistributeBarrier 类算子")
         code = gen_distribute_barrier_like_code(op_class_name, inputs, outputs, attrs)
+    else:
+        print("  类型: 通用算子 (General)")
+        code = gen_general_op_code(op_class_name, inputs, outputs, attrs)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(code, encoding="utf-8")

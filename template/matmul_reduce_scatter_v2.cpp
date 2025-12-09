@@ -1,36 +1,31 @@
 /**
- * This program is free software, you can redistribute it and/or modify.
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
  * This file is a part of the CANN Open Software.
  * Licensed under CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
 #include <iostream>
-#include <thread>
 #include <cctype>
 #include <gtest/gtest.h>
 #include "mc2_tiling_case_executor.h"
 
-namespace AllGatherMatmulUT {
-
-namespace {
-
+namespace MatmulReduceScatterV2UT {
 template <typename T>
-auto build_from(const T &value)
-{
+auto build_from(const T& value){
     return Ops::Transformer::AnyValue::CreateFrom<T>(value);
 }
 
 // 定义用例信息结构体
-struct AllGatherMatmulTilingTestParam {
+struct MatmulReduceScatterV2TilingTestParam {
     // 平台信息
     uint64_t inputTotalNum;
-    std::string case_name;
-    std::string compile_info;
-    std::string soc_version;
+    string case_name;
+    string compile_info;
+    string soc_version;
     uint64_t coreNum;
     uint64_t ubSize;
     uint64_t tilingDataSize;
@@ -65,53 +60,50 @@ struct AllGatherMatmulTilingTestParam {
     bool is_trans_b;
 
     // 结果
-    bool expectSuccess; // 是否期望 tiling 成功
     uint64_t expectTilingKey;
 };
 
-class AllGatherMatmulTilingParam : public ::testing::TestWithParam<AllGatherMatmulTilingTestParam> {
+class MatmulReduceScatterV2TilingParam : public ::testing::TestWithParam<MatmulReduceScatterV2TilingTestParam> {
 protected:
     static void SetUpTestCase()
     {
-        std::cout << "AllGatherMatmulTiling SetUp" << std::endl;
+        std::cout << "MatmulReduceScatterV2Tiling SetUp" << std::endl;
     }
 
     static void TearDownTestCase()
     {
-        std::cout << "AllGatherMatmulTiling TearDown" << std::endl;
+        std::cout << "MatmulReduceScatterV2Tiling TearDown" << std::endl;
     }
 };
 
-gert::StorageShape make_shape(const std::initializer_list<int64_t> &input_shape)
-{
-    if (input_shape.size() == 0) {
+gert::StorageShape make_shape(const std::initializer_list<int64_t>& input_shape){
+    if (input_shape.size() == 0){
         return gert::StorageShape{};
     }
     return gert::StorageShape{input_shape, input_shape};
 }
 
-void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
-{
-    struct AllGatherMatmulCompileInfo {};
-    AllGatherMatmulCompileInfo compileInfo;
+void TestOneParamCase(const MatmulReduceScatterV2TilingTestParam& param){
+    struct MatmulReduceScatterV2CompileInfo {};
+    MatmulReduceScatterV2CompileInfo compileInfo;
 
     // 存取用户输入的用例信息
-    std::vector<std::pair<std::initializer_list<int64_t>, ge::DataType>> shapeDtypeList = {
-        {param.x1_shape, param.x1_dtype},
-        {param.x2_shape, param.x2_dtype},
-        {param.bias_shape, param.bias_dtype},
-        {param.x3_shape, param.x3_dtype},
-        {param.antiquant_scale_shape, param.antiquant_scale_dtype},
-        {param.antiquant_offset_shape, param.antiquant_offset_dtype},
-        {param.dequant_scale_shape, param.dequant_scale_dtype},
-        {param.pertoken_scale_shape, param.pertoken_scale_dtype},
-        {param.comm_quant_scale_1_shape, param.comm_quant_scale_1_dtype},
-        {param.comm_quant_scale_2_shape, param.comm_quant_scale_2_dtype}
+    std::vector<pair<std::initializer_list<int64_t>, ge::DataType>> shapeDtypeList = {
+    {param.x1_shape, param.x1_dtype}, 
+    {param.x2_shape, param.x2_dtype}, 
+    {param.bias_shape, param.bias_dtype}, 
+    {param.x3_shape, param.x3_dtype}, 
+    {param.antiquant_scale_shape, param.antiquant_scale_dtype}, 
+    {param.antiquant_offset_shape, param.antiquant_offset_dtype}, 
+    {param.dequant_scale_shape, param.dequant_scale_dtype}, 
+    {param.pertoken_scale_shape, param.pertoken_scale_dtype}, 
+    {param.comm_quant_scale_1_shape, param.comm_quant_scale_1_dtype}, 
+    {param.comm_quant_scale_2_shape, param.comm_quant_scale_2_dtype}
     };
 
     // 按需提取后传入构造
     std::vector<gert::TilingContextPara::TensorDescription> inputList;
-    for (uint64_t i = 0; i < param.inputTotalNum; ++i) {
+    for (int i = 0; i < param.inputTotalNum; i++){
         inputList.push_back({make_shape(shapeDtypeList[i].first), shapeDtypeList[i].second, ge::FORMAT_ND});
     }
 
@@ -120,41 +112,41 @@ void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
         {make_shape(param.x1_shape), param.x1_dtype, ge::FORMAT_ND},
     };
 
-    gert::TilingContextPara tilingContextPara("AllGatherMatmul", inputList, outputList,
+    gert::TilingContextPara tilingContextPara("MatmulReduceScatterV2", inputList, outputList,
         {
             {"group", build_from<std::string>("group")},
+            {"reduce_op", build_from<std::string>("sum")},
             {"is_trans_a", build_from<bool>(param.is_trans_a)},
             {"is_trans_b", build_from<bool>(param.is_trans_b)},
-            {"gather_index", build_from<int64_t>(0)},
             {"comm_turn", build_from<int64_t>(0)},
             {"rank_size", build_from<int64_t>(0)},
-            {"is_gather_out", build_from<bool>(true)},
+            {"block_size", build_from<int64_t>(0)},
+            {"group_size", build_from<int64_t>(0)},
+            {"is_amax_out", build_from<bool>(false)},
+            {"y_dtype", build_from<int64_t>(0)},
+            {"comm_mode", build_from<std::string>("")}
         },
         &compileInfo, param.soc_version, param.compile_info, param.tilingDataSize);
 
-    if (!param.expectSuccess) {
-        Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
-        Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_FAILED, 0);
-    } else {
-        Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
-        Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_SUCCESS, param.expectTilingKey);
-    }
+    ExecuteTestCase(tilingContextPara, ge::GRAPH_SUCCESS, param.expectTilingKey);
 }
 
-TEST_P(AllGatherMatmulTilingParam, general_case)
+TEST_P(MatmulReduceScatterV2TilingParam, general_case)
 {
-    if (!IsOpImplRegistryAvailable()) {
-        GTEST_SKIP() << "Skip test: OpImplSpaceRegistryV2 is null on host.";
-    }
+    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
+    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().SetValues(hcomTopologyMockValues);
+
     const auto &param = GetParam();
     TestOneParamCase(param);
+
+    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().Reset();
 }
 
 INSTANTIATE_TEST_SUITE_P(
     general_cases_params,
-    AllGatherMatmulTilingParam,
+    MatmulReduceScatterV2TilingParam,
     ::testing::ValuesIn(cases_params),
-    [](const ::testing::TestParamInfo<AllGatherMatmulTilingTestParam> &info) {
+    [](const ::testing::TestParamInfo<MatmulReduceScatterV2TilingTestParam> &info) {
         std::string name = info.param.case_name;
         for (char &c : name) {
             if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') {
@@ -164,6 +156,4 @@ INSTANTIATE_TEST_SUITE_P(
         return name;
     });
 
-} // anonymous namespace
-
-} // namespace AllGatherMatmulUT
+} // namespace MatmulReduceScatterV2UT

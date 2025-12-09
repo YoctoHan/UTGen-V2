@@ -65,26 +65,16 @@ void TestOneParamCase(const DistributeBarrierTilingTestParam &param)
 const std::string COMPILE_INFO = "8 8 20 196352 0 0 ";
 
 DistributeBarrierTilingTestParam cases_params[] = {
-    {"distribute_barrier_basic_small", 4, 4, ge::DT_FLOAT16, "default_group", 8,
-        "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
-    {"distribute_barrier_basic_medium", 256, 256, ge::DT_FLOAT16, "default_group", 8,
-        "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
-    {"distribute_barrier_basic_large", 1024, 1024, ge::DT_FLOAT16, "default_group", 8,
-        "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
-    {"distribute_barrier_world_size_2", 128, 128, ge::DT_FLOAT16, "default_group", 2,
-        "Ascend910_93", 20, 196608, 10000UL, "8 2 20 196352 0 0 ", {16777216}, 42},
-    {"distribute_barrier_world_size_4", 128, 128, ge::DT_FLOAT16, "default_group", 4,
-        "Ascend910_93", 20, 196608, 10000UL, "8 4 20 196352 0 0 ", {16777216}, 42},
-    {"distribute_barrier_world_size_16", 128, 128, ge::DT_FLOAT16, "default_group", 16,
-        "Ascend910_93", 20, 196608, 10000UL, "8 16 20 196352 0 0 ", {16777216}, 42},
-    {"distribute_barrier_world_size_32", 128, 128, ge::DT_FLOAT16, "default_group", 32,
-        "Ascend910_93", 20, 196608, 10000UL, "8 32 20 196352 0 0 ", {16777216}, 42},
-    {"distribute_barrier_custom_group", 64, 64, ge::DT_FLOAT16, "custom_group_name", 8,
-        "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
-    {"distribute_barrier_bfloat16", 128, 128, ge::DT_BF16, "default_group", 8,
-        "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
-    {"distribute_barrier_single_element", 1, 1, ge::DT_FLOAT16, "default_group", 8,
-        "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
+    {"distribute_barrier_basic_small", 4, 4, ge::DT_FLOAT16, "default_group", 8, "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
+    {"distribute_barrier_basic_medium", 256, 256, ge::DT_FLOAT16, "default_group", 8, "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
+    {"distribute_barrier_basic_large", 1024, 1024, ge::DT_FLOAT16, "default_group", 8, "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
+    {"distribute_barrier_world_size_2", 128, 128, ge::DT_FLOAT16, "default_group", 2, "Ascend910_93", 20, 196608, 10000UL, "8 2 20 196352 0 0 ", {16777216}, 42},
+    {"distribute_barrier_world_size_4", 128, 128, ge::DT_FLOAT16, "default_group", 4, "Ascend910_93", 20, 196608, 10000UL, "8 4 20 196352 0 0 ", {16777216}, 42},
+    {"distribute_barrier_world_size_16", 128, 128, ge::DT_FLOAT16, "default_group", 16, "Ascend910_93", 20, 196608, 10000UL, "8 16 20 196352 0 0 ", {16777216}, 42},
+    {"distribute_barrier_world_size_32", 128, 128, ge::DT_FLOAT16, "default_group", 32, "Ascend910_93", 20, 196608, 10000UL, "8 32 20 196352 0 0 ", {16777216}, 42},
+    {"distribute_barrier_custom_group", 64, 64, ge::DT_FLOAT16, "custom_group_name", 8, "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
+    {"distribute_barrier_bfloat16", 128, 128, ge::DT_BF16, "default_group", 8, "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
+    {"distribute_barrier_single_element", 1, 1, ge::DT_FLOAT16, "default_group", 8, "Ascend910_93", 20, 196608, 10000UL, COMPILE_INFO, {16777216}, 42},
 };
 
 TEST_P(DistributeBarrierTilingParam, general_case)

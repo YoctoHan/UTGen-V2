@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Optional, Dict, Any, Literal
+from typing import TypedDict, List, Optional, Dict, Any, Literal, Union
 from config import OperatorName, OpType, OPS_TRANSFORMERS_DIR
 import os
 from pathlib import Path
@@ -6,8 +6,8 @@ from pathlib import Path
 
 class WorkflowState(TypedDict):
     # ========== 步骤1：输入信息 ==========
-    operator_name: Literal["all_gather_matmul", "matmul_all_reduce", "distribute_barrier"]
-    op_type: Literal["op_host"]
+    operator_name: str
+    op_type: str
 
     # ========== 步骤2：模型输出 ==========
     input_path: str
@@ -20,7 +20,7 @@ class WorkflowState(TypedDict):
     output_path: str
 
 
-def create_initial_state(operator_name: OperatorName, operator_type: OpType) -> WorkflowState:
+def create_initial_state(operator_name: Union[OperatorName, str], operator_type: Union[OpType, str]) -> WorkflowState:
     """
     根据算子名称和类型生成初始状态，包括：
     - def_file_path: 指向 ops-transformer 仓库中的 *_def.cpp
@@ -37,8 +37,8 @@ def create_initial_state(operator_name: OperatorName, operator_type: OpType) -> 
     - target/: 存放 ground truth (期望输出，用于验证生成结果)
     """
     # ops-transformer 仓库中的 def.cpp
-    op_name = operator_name.value
-    op_type = operator_type.value
+    op_name = operator_name.value if isinstance(operator_name, OperatorName) else str(operator_name)
+    op_type = operator_type.value if isinstance(operator_type, OpType) else str(operator_type)
 
     def_file_path = os.path.join(
         OPS_TRANSFORMERS_DIR,
@@ -65,4 +65,3 @@ def create_initial_state(operator_name: OperatorName, operator_type: OpType) -> 
         template_file_path=str(template_file_path),
         output_path=str(output_path),
     )
-

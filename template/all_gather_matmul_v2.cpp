@@ -14,7 +14,7 @@
 #include <gtest/gtest.h>
 #include "mc2_tiling_case_executor.h"
 
-namespace AllGatherMatmulUT {
+namespace AllGatherMatmulV2UT {
 
 namespace {
 
@@ -25,7 +25,7 @@ auto build_from(const T &value)
 }
 
 // 定义用例信息结构体
-struct AllGatherMatmulTilingTestParam {
+struct AllGatherMatmulV2TilingTestParam {
     // 平台信息
     uint64_t inputTotalNum;
     std::string case_name;
@@ -69,16 +69,16 @@ struct AllGatherMatmulTilingTestParam {
     uint64_t expectTilingKey;
 };
 
-class AllGatherMatmulTilingParam : public ::testing::TestWithParam<AllGatherMatmulTilingTestParam> {
+class AllGatherMatmulV2TilingParam : public ::testing::TestWithParam<AllGatherMatmulV2TilingTestParam> {
 protected:
     static void SetUpTestCase()
     {
-        std::cout << "AllGatherMatmulTiling SetUp" << std::endl;
+        std::cout << "AllGatherMatmulV2Tiling SetUp" << std::endl;
     }
 
     static void TearDownTestCase()
     {
-        std::cout << "AllGatherMatmulTiling TearDown" << std::endl;
+        std::cout << "AllGatherMatmulV2Tiling TearDown" << std::endl;
     }
 };
 
@@ -90,10 +90,10 @@ gert::StorageShape make_shape(const std::initializer_list<int64_t> &input_shape)
     return gert::StorageShape{input_shape, input_shape};
 }
 
-void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
+void TestOneParamCase(const AllGatherMatmulV2TilingTestParam &param)
 {
-    struct AllGatherMatmulCompileInfo {};
-    AllGatherMatmulCompileInfo compileInfo;
+    struct AllGatherMatmulV2CompileInfo {};
+    AllGatherMatmulV2CompileInfo compileInfo;
 
     // 存取用户输入的用例信息
     std::vector<std::pair<std::initializer_list<int64_t>, ge::DataType>> shapeDtypeList = {
@@ -120,7 +120,7 @@ void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
         {make_shape(param.x1_shape), param.x1_dtype, ge::FORMAT_ND},
     };
 
-    gert::TilingContextPara tilingContextPara("AllGatherMatmul", inputList, outputList,
+    gert::TilingContextPara tilingContextPara("AllGatherMatmulV2", inputList, outputList,
         {
             {"group", build_from<std::string>("group")},
             {"is_trans_a", build_from<bool>(param.is_trans_a)},
@@ -128,7 +128,12 @@ void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
             {"gather_index", build_from<int64_t>(0)},
             {"comm_turn", build_from<int64_t>(0)},
             {"rank_size", build_from<int64_t>(0)},
+            {"block_size", build_from<int64_t>(0)},
+            {"group_size", build_from<int64_t>(0)},
             {"is_gather_out", build_from<bool>(true)},
+            {"is_amax_out", build_from<bool>(false)},
+            {"y_dtype", build_from<int64_t>(0)},
+            {"comm_mode", build_from<std::string>("")},
         },
         &compileInfo, param.soc_version, param.compile_info, param.tilingDataSize);
 
@@ -141,7 +146,7 @@ void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
     }
 }
 
-TEST_P(AllGatherMatmulTilingParam, general_case)
+TEST_P(AllGatherMatmulV2TilingParam, general_case)
 {
     if (!IsOpImplRegistryAvailable()) {
         GTEST_SKIP() << "Skip test: OpImplSpaceRegistryV2 is null on host.";
@@ -152,9 +157,9 @@ TEST_P(AllGatherMatmulTilingParam, general_case)
 
 INSTANTIATE_TEST_SUITE_P(
     general_cases_params,
-    AllGatherMatmulTilingParam,
+    AllGatherMatmulV2TilingParam,
     ::testing::ValuesIn(cases_params),
-    [](const ::testing::TestParamInfo<AllGatherMatmulTilingTestParam> &info) {
+    [](const ::testing::TestParamInfo<AllGatherMatmulV2TilingTestParam> &info) {
         std::string name = info.param.case_name;
         for (char &c : name) {
             if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') {
@@ -166,4 +171,4 @@ INSTANTIATE_TEST_SUITE_P(
 
 } // anonymous namespace
 
-} // namespace AllGatherMatmulUT
+} // namespace AllGatherMatmulV2UT
