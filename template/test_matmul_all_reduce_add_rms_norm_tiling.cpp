@@ -1,0 +1,271 @@
+/**
+ * This program is free software, you can redistribute it and/or modify.
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This file is a part of the CANN Open Software.
+ * Licensed under CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+#include <gtest/gtest.h>
+#include <iostream>
+#include <cctype>
+#include "mc2_tiling_case_executor.h"
+#include "../../../op_host/op_tiling/quant_matmul_all_reduce_add_rms_norm_tiling.h"
+#include "../../../op_host/op_tiling/matmul_all_reduce_add_rms_norm_tiling.h"
+#include "../../../op_host/op_tiling/weight_quant_matmul_all_reduce_add_rms_norm_tiling.h"
+
+namespace MatmulAllReduceAddRmsNormUT {
+
+namespace {
+
+template <typename T>
+auto build_from(const T &value)
+{
+    return Ops::Transformer::AnyValue::CreateFrom<T>(value);
+}
+
+struct TestParam {
+    std::string caseName;
+    uint32_t blockDim;
+    uint64_t tilingKey;
+};
+
+using WeightQuantTestParam = TestParam;
+
+std::unique_ptr<gert::TilingContextPara::TensorDescription> CreateTensorShape(
+    gert::StorageShape shape,
+    ge::DataType dtype,
+    ge::Format format)
+{
+    return std::unique_ptr<gert::TilingContextPara::TensorDescription>(
+        new gert::TilingContextPara::TensorDescription(
+            shape,
+            dtype,
+            format));
+}
+
+class MatmulAllReduceAddRmsNormTiling : public ::testing::TestWithParam<TestParam> {
+protected:
+    static void SetUpTestCase()
+    {
+        std::cout << "MatmulAllReduceAddRmsNormTiling Test SetUp" << std::endl;
+    }
+
+    static void TearDownTestCase()
+    {
+        std::cout << "MatmulAllReduceAddRmsNormTiling Test TearDown" << std::endl;
+    }
+};
+
+static void SplitStr2Vec(const std::string &input, const std::string &delimiter,
+                         std::vector<std::string> &output)
+{
+    auto delimiterLen = delimiter.size();
+    std::string::size_type currPos = 0;
+    std::string::size_type nextPos = input.find(delimiter, currPos);
+    while (nextPos != std::string::npos) {
+        output.emplace_back(input.substr(currPos, nextPos - currPos));
+        currPos = nextPos + delimiterLen;
+        nextPos = input.find(delimiter, currPos);
+    }
+
+    if (currPos < input.size()) {
+        output.emplace_back(input.substr(currPos));
+    }
+}
+
+std::map<std::string, ge::DataType> dtypeMap = {
+    {"FLOAT16", ge::DT_FLOAT16}, {"FLOAT", ge::DT_FLOAT},   {"BF16", ge::DT_BF16},
+    {"INT8", ge::DT_INT8},       {"INT4", ge::DT_INT4},     {"UINT64", ge::DT_UINT64},
+    {"INT32", ge::DT_INT32}};
+
+struct MatmulAllReduceArnCompileInfo{
+    int32_t totalCoreNum = 0;
+    uint64_t ubSize = 0;    
+};
+
+static void TestOneParamCase(const WeightQuantTestParam &param)
+{
+    std::cout << "run case " << param.caseName << std::endl;
+    std::vector<std::string> testParam;
+    SplitStr2Vec(param.caseName, "_", testParam);
+
+    std::size_t idx = 0;
+    std::string model_name = testParam[idx++];
+    bool is_valid_case = false;
+    if (model_name.find("InValid") != std::string::npos) {
+        is_valid_case = true;
+    }
+    std::string group_name = testParam[idx++];
+    std::string reduce_op = testParam[idx++];
+
+    int64_t m = stol(testParam[idx++]);
+    int64_t k = stol(testParam[idx++]);
+    int64_t n = stol(testParam[idx++]);
+
+    int64_t biasFlag = stol(testParam[idx++]);
+    int64_t x3Flag = stol(testParam[idx++]);
+    int64_t transA = stol(testParam[idx++]);
+    int64_t transB = stol(testParam[idx++]);
+    int64_t group = stol(testParam[idx++]);
+    int64_t antiquant_offsetExistFlag = stol(testParam[idx++]);
+    int64_t antiquant_scaleExistFlag = stol(testParam[idx++]);
+    int64_t dequant_scaleExistFlag = stol(testParam[idx++]);
+    int64_t antigroupSize = stol(testParam[idx++]);
+    float epslion = stof(testParam[idx++]);
+
+    ge::DataType xDtype = dtypeMap[testParam[idx++]];
+    ge::DataType weightDtype = dtypeMap[testParam[idx++]];
+    ge::DataType biasDtype = dtypeMap[testParam[idx++]];
+    ge::DataType yDtype = dtypeMap[testParam[idx++]];
+    ge::DataType normOutDtype = yDtype;
+    ge::DataType quantDtype = yDtype;
+
+    auto xShape = CreateTensorShape({}, xDtype, ge::FORMAT_ND);
+    auto weigthShape = CreateTensorShape({}, weightDtype, ge::FORMAT_ND);
+    auto biasShape = CreateTensorShape({}, biasDtype, ge::FORMAT_ND);
+    auto residualShape = CreateTensorShape({{1, m, n}, {1, m, n}}, yDtype, ge::FORMAT_ND);
+    auto gammaShape = CreateTensorShape({{n}, {n}}, yDtype, ge::FORMAT_ND);
+    auto antiQuantOffsetShape = CreateTensorShape({}, xDtype, ge::FORMAT_ND);
+    auto antiQuantScaleShape = CreateTensorShape({}, xDtype, ge::FORMAT_ND);
+    auto quantScaleShape = CreateTensorShape({}, quantDtype, ge::FORMAT_ND);
+    auto yShape = CreateTensorShape({{1, m, n}, {1, m, n}}, yDtype, ge::FORMAT_ND);
+
+    auto normOutputShape = CreateTensorShape({{1, m, n}, {1, m, n}}, normOutDtype, ge::FORMAT_ND);
+
+    if (transA) {
+        xShape->shape_ = {{k, m}, {k, m}};
+    } else {
+        xShape->shape_ = {{m, k}, {m, k}};
+    }
+
+    if (transB) {
+        weigthShape->shape_ = {{n, k}, {n, k}};
+    } else {
+        weigthShape->shape_ = {{k, n}, {k, n}};
+    }
+
+    {
+        if (group > 0) {
+            int64_t groupNum = (k + group - 1) / group;
+            if (transB) {
+                antiQuantOffsetShape->shape_ = {{n, groupNum}, {n, groupNum}};
+                antiQuantScaleShape->shape_ = {{n, groupNum}, {m, groupNum}};
+            } else {
+                antiQuantOffsetShape->shape_ = {{groupNum, n}, {groupNum, n}};
+                antiQuantScaleShape->shape_ = {{groupNum, n}, {groupNum, n}};
+            }
+        } else if (group < 0) {
+            antiQuantOffsetShape->shape_ = {{n}, {n}};
+            antiQuantScaleShape->shape_ = {{n}, {n}};
+            quantScaleShape->shape_ = {{n}, {n}};
+            if (yDtype != ge::DT_BF16) {
+                quantDtype = ge::DT_UINT64;
+            }
+        } else {
+            antiQuantOffsetShape->shape_ = {{1}, {1}};
+            antiQuantScaleShape->shape_ = {{1}, {1}};
+            quantScaleShape->shape_ = {{1}, {1}};
+            if (yDtype != ge::DT_BF16) {
+                quantDtype = ge::DT_UINT64;
+            }
+        }
+    }
+    quantScaleShape->dtype_ = quantDtype;
+    if (biasFlag){
+        biasShape->shape_ = {{n}, {n}};
+    }
+    if (!antiquant_offsetExistFlag){
+        antiQuantOffsetShape->shape_ = {};
+    }
+    if (!antiquant_scaleExistFlag){
+        antiQuantScaleShape->shape_ = {};
+    }
+    if (!dequant_scaleExistFlag){
+        quantScaleShape->shape_ = {};
+    }
+    if (yShape->dtype_ == ge::DT_BF16) {
+        printf("the yDtype is BF16\n");
+    } else {
+        printf("Exist error!\n");
+    }
+    printf("dataType BF16 is : %d",ge::DataType::DT_BF16);
+    MatmulAllReduceArnCompileInfo compileInfo {8, 262144};
+    const std::string socVersion = "Ascend910B";
+    uint64_t coreNum = 8;
+    uint64_t ubSize = 262144;
+    uint64_t tilingDataSize = 40960;
+    gert::TilingContextPara tilingContextPara("MatmulAllReduceAddRmsNorm",
+        {
+            *xShape,
+            *weigthShape,
+            *biasShape,
+            *residualShape,
+            *gammaShape,
+            *antiQuantOffsetShape,
+            *antiQuantScaleShape,
+            *quantScaleShape,
+        },
+        {
+            *yShape,
+            *normOutputShape,
+        },
+        {
+            {"group", build_from<std::string>(group_name)},
+            {"reduce_op", build_from<std::string>(reduce_op)},
+            {"is_trans_a", build_from<bool>(static_cast<bool>(transA))},
+            {"is_trans_b", build_from<bool>(static_cast<bool>(transB))},
+            {"comm_turn", build_from<int64_t>(0)},
+            {"antiquant_group_size", build_from<int64_t>(antigroupSize)},
+            {"epslion", build_from<float>(epslion)},
+        },
+        &compileInfo,
+        socVersion,
+        coreNum,
+        ubSize,
+        tilingDataSize);
+    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
+    if (is_valid_case) {
+        Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues);
+    } else {
+        Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_FAILED, param.tilingKey);
+    }
+}
+
+TEST_P(MatmulAllReduceAddRmsNormTiling, generalTest) {
+    const auto &param = GetParam();
+    TestOneParamCase(param);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    MatMulAllReduceAddResNormal,
+    MatmulAllReduceAddRmsNormTiling,
+    ::testing::ValuesIn(casesParamsQuant),
+    [](const ::testing::TestParamInfo<TestParam> &info) {
+        std::string name = info.param.caseName;
+        for (char &c : name) {
+            if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') {
+                c = '_';
+            }
+        }
+        return name;
+    });
+
+INSTANTIATE_TEST_SUITE_P(
+    MatMulAllReduceAddResNormal2,
+    MatmulAllReduceAddRmsNormTiling,
+    ::testing::ValuesIn(InValidCheckcasesParamsQuant),
+    [](const ::testing::TestParamInfo<TestParam> &info) {
+        std::string name = info.param.caseName;
+        for (char &c : name) {
+            if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') {
+                c = '_';
+            }
+        }
+        return name;
+    });
+
+} // anonymous namespace
+
+} // namespace MatmulAllReduceAddRmsNormUT

@@ -113,22 +113,12 @@ void TestOneParamCase(const GroupedMatMulAllReduceTilingTestParam &param)
     Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_SUCCESS, param.expectTilingKey);
 }
 
-GroupedMatMulAllReduceTilingTestParam cases_params[] = {
-    {"grouped_mat_mul_all_reduce_test_tiling_float16_1", "Ascend910B", 20, 196608, 40960, {8192, 1536}, {1536, 12288}, {8192, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 8, 0UL},
-    {"grouped_mat_mul_all_reduce_test_mcut_float16_910B_1", "Ascend910B", 20, 196608, 40960, {12290, 15360}, {15360, 12288}, {12290, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 8, 0UL},
-    {"grouped_mat_mul_all_reduce_test_mcut_float16_910B_2", "Ascend910B", 20, 196608, 40960, {20, 2}, {2, 2}, {20, 2}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 2, 0UL},
-    {"grouped_mat_mul_all_reduce_test_mcut_float16_910B_win2win", "Ascend910B", 20, 196608, 40960, {12290, 15360}, {15360, 12288}, {12290, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 8, 0UL},
-    {"grouped_mat_mul_all_reduce_test_tiling_float16_2", "Ascend910B", 20, 196608, 40960, {8192, 1536}, {1536, 12288}, {8192, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 8, 0UL},
-    {"grouped_mat_mul_all_reduce_test_tiling_float16_3", "Ascend910B", 20, 196608, 40960, {128, 1536}, {1536, 8192}, {8192, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 8, 0UL},
-    {"grouped_mat_mul_all_reduce_test_tiling_float16_4", "Ascend910B", 20, 196608, 40960, {1024, 1536}, {1536, 8192}, {8192, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 8, 0UL},
-    {"grouped_mat_mul_all_reduce_test_tiling_float16_5", "Ascend910B", 20, 196608, 40960, {256, 1536}, {1536, 8192}, {8192, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 8, 0UL},
-    {"grouped_mat_mul_all_reduce_test_tiling_float16_support_3_dim", "Ascend910B", 20, 196608, 40960, {1, 8192, 1536}, {1536, 12288}, {1, 8192, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, 8, 0UL},
-    {"grouped_mat_mul_all_reduce_test_tiling_bfloat16", "Ascend910B", 20, 196608, 40960, {8192, 1536}, {1536, 12288}, {8192, 12288}, ge::DT_BF16, ge::DT_BF16, ge::DT_BF16, 8, 0UL},
-};
-
 TEST_P(GroupedMatMulAllReduceTilingParam, general_case)
 {
-const auto &param = GetParam();
+    if (!IsOpImplRegistryAvailable()) {
+        GTEST_SKIP() << "Skip test: OpImplSpaceRegistryV2 is null on host.";
+    }
+    const auto &param = GetParam();
     TestOneParamCase(param);
 }
 

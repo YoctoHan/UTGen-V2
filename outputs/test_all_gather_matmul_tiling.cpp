@@ -24,9 +24,7 @@ auto build_from(const T &value)
     return Ops::Transformer::AnyValue::CreateFrom<T>(value);
 }
 
-// 定义用例信息结构体
 struct AllGatherMatmulTilingTestParam {
-    // 平台信息
     uint64_t inputTotalNum;
     std::string case_name;
     std::string compile_info;
@@ -35,7 +33,6 @@ struct AllGatherMatmulTilingTestParam {
     uint64_t ubSize;
     uint64_t tilingDataSize;
 
-    // 输入信息shape
     std::initializer_list<int64_t> x1_shape;
     std::initializer_list<int64_t> x2_shape;
     std::initializer_list<int64_t> bias_shape;
@@ -46,9 +43,8 @@ struct AllGatherMatmulTilingTestParam {
     std::initializer_list<int64_t> pertoken_scale_shape;
     std::initializer_list<int64_t> comm_quant_scale_1_shape;
     std::initializer_list<int64_t> comm_quant_scale_2_shape;
-    std::initializer_list<int64_t> output_shape; // 输出信息
+    std::initializer_list<int64_t> output_shape;
 
-    // 输入信息类型
     ge::DataType x1_dtype;
     ge::DataType x2_dtype;
     ge::DataType bias_dtype;
@@ -59,13 +55,11 @@ struct AllGatherMatmulTilingTestParam {
     ge::DataType pertoken_scale_dtype;
     ge::DataType comm_quant_scale_1_dtype;
     ge::DataType comm_quant_scale_2_dtype;
-    ge::DataType output_dtype; // 输出信息
+    ge::DataType output_dtype; 
 
     bool is_trans_a;
     bool is_trans_b;
 
-    // 结果
-    bool expectSuccess; // 是否期望 tiling 成功
     uint64_t expectTilingKey;
 };
 
@@ -95,7 +89,6 @@ void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
     struct AllGatherMatmulCompileInfo {};
     AllGatherMatmulCompileInfo compileInfo;
 
-    // 存取用户输入的用例信息
     std::vector<std::pair<std::initializer_list<int64_t>, ge::DataType>> shapeDtypeList = {
         {param.x1_shape, param.x1_dtype},
         {param.x2_shape, param.x2_dtype},
@@ -109,7 +102,6 @@ void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
         {param.comm_quant_scale_2_shape, param.comm_quant_scale_2_dtype}
     };
 
-    // 按需提取后传入构造
     std::vector<gert::TilingContextPara::TensorDescription> inputList;
     for (uint64_t i = 0; i < param.inputTotalNum; ++i) {
         inputList.push_back({make_shape(shapeDtypeList[i].first), shapeDtypeList[i].second, ge::FORMAT_ND});
@@ -127,67 +119,62 @@ void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
             {"is_trans_b", build_from<bool>(param.is_trans_b)},
             {"gather_index", build_from<int64_t>(0)},
             {"comm_turn", build_from<int64_t>(0)},
-            {"rank_size", build_from<int64_t>(0)},
-            {"is_gather_out", build_from<bool>(true)},
         },
         &compileInfo, param.soc_version, param.compile_info, param.tilingDataSize);
 
-    if (!param.expectSuccess) {
-        Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
-        Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_FAILED, 0);
-    } else {
-        Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
-        Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_SUCCESS, param.expectTilingKey);
-    }
+    ExecuteTestCase(tilingContextPara, ge::GRAPH_SUCCESS, param.expectTilingKey);
 }
 
 const std::string COMPILE_INFO = R"({"hardware_info": {"BT_SIZE": 0, "load3d_constraints": "1", "Intrinsic_fix_pipe_l0c2out": false, "Intrinsic_data_move_l12ub": true, "Intrinsic_data_move_l0c2ub": true, "Intrinsic_data_move_out2l1_nd2nz": false, "UB_SIZE": 196608, "L2_SIZE": 33554432, "L1_SIZE": 524288, "L0A_SIZE": 65536, "L0B_SIZE": 65536, "L0C_SIZE": 131072, "CORE_NUM": 20, "socVersion": "Ascend910B"}})";
 
+// 用例列表集
 AllGatherMatmulTilingTestParam cases_params[] = {
     {4, "all_gather_matmul_test_tiling_float16_1", COMPILE_INFO, "Ascend910B", 20, 196608, 4096,
         {512, 12288}, {12288, 3904}, {}, {}, {}, {}, {}, {}, {}, {},
         {512, 3904}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_STRING,
         ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT,
-        ge::DT_FLOAT16, false, false, true, 3UL},
+        ge::DT_FLOAT16, false, false, 3UL},
 
     {4, "all_gather_matmul_test_tiling_float16_2", COMPILE_INFO, "Ascend910B", 20, 196608, 4096,
         {2048, 4096}, {4096, 1536}, {}, {}, {}, {}, {}, {}, {}, {},
         {2048, 1536}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_STRING,
         ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT,
-        ge::DT_FLOAT16, false, true, true, 3UL},
+        ge::DT_FLOAT16, false, true, 3UL},
 
     {4, "all_gather_matmul_test_tiling_float16_3", COMPILE_INFO, "Ascend910B", 20, 196608, 4096,
         {327680, 15360}, {15360, 10240}, {}, {}, {}, {}, {}, {}, {}, {},
         {327680, 10240}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_STRING,
         ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT,
-        ge::DT_FLOAT16, false, true, true, 3UL},
+        ge::DT_FLOAT16, false, true, 3UL},
 
     {4, "all_gather_matmul_test_tiling_bfloat16", COMPILE_INFO, "Ascend910B", 20, 196608, 4096,
         {2048, 4096}, {4096, 1536}, {12288}, {}, {}, {}, {}, {}, {}, {},
         {2048, 1536}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_STRING,
         ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT,
-        ge::DT_FLOAT16, false, false, true, 7UL},
+        ge::DT_FLOAT16, false, false, 7UL},
 
     {4, "all_gather_matmul_test_tiling_float16_l2cache", COMPILE_INFO, "Ascend910B", 20, 196608, 4096,
         {8192, 5120}, {5120, 12288}, {12288}, {}, {}, {}, {}, {}, {}, {},
         {8192, 12288}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_STRING,
         ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT,
-        ge::DT_FLOAT16, false, true, true, 7UL},
+        ge::DT_FLOAT16, false, true, 7UL},
 
     {4, "all_gather_matmul_test_tiling_n_0", COMPILE_INFO, "Ascend910B", 20, 196608, 4096,
         {1024, 256}, {256, 0}, {}, {}, {}, {}, {}, {}, {}, {},
         {1024, 0}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_STRING,
         ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT,
-        ge::DT_FLOAT16, false, true, true, 3UL},
+        ge::DT_FLOAT16, false, true, 3UL},
 };
 
 TEST_P(AllGatherMatmulTilingParam, general_case)
 {
-    if (!IsOpImplRegistryAvailable()) {
-        GTEST_SKIP() << "Skip test: OpImplSpaceRegistryV2 is null on host.";
-    }
+    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
+    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().SetValues(hcomTopologyMockValues);
+
     const auto &param = GetParam();
     TestOneParamCase(param);
+
+    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().Reset();
 }
 
 INSTANTIATE_TEST_SUITE_P(

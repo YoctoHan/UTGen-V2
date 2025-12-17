@@ -9,10 +9,9 @@
  */
 
 #include <iostream>
-#include <thread>
 #include <cctype>
 #include <gtest/gtest.h>
-#include "mc2_tiling_case_executor.h"
+#include "../../../../../tests/ut/framework_normal/common/mc2_tiling_case_executor.h"
 
 namespace AllGatherMatmulV2UT {
 
@@ -24,9 +23,7 @@ auto build_from(const T &value)
     return Ops::Transformer::AnyValue::CreateFrom<T>(value);
 }
 
-// 定义用例信息结构体
-struct AllGatherMatmulV2TilingTestParam {
-    // 平台信息
+struct AllGatherMatmulTilingTestParam {
     uint64_t inputTotalNum;
     std::string case_name;
     std::string compile_info;
@@ -35,7 +32,6 @@ struct AllGatherMatmulV2TilingTestParam {
     uint64_t ubSize;
     uint64_t tilingDataSize;
 
-    // 输入信息shape
     std::initializer_list<int64_t> x1_shape;
     std::initializer_list<int64_t> x2_shape;
     std::initializer_list<int64_t> bias_shape;
@@ -46,9 +42,8 @@ struct AllGatherMatmulV2TilingTestParam {
     std::initializer_list<int64_t> pertoken_scale_shape;
     std::initializer_list<int64_t> comm_quant_scale_1_shape;
     std::initializer_list<int64_t> comm_quant_scale_2_shape;
-    std::initializer_list<int64_t> output_shape; // 输出信息
+    std::initializer_list<int64_t> output_shape;
 
-    // 输入信息类型
     ge::DataType x1_dtype;
     ge::DataType x2_dtype;
     ge::DataType bias_dtype;
@@ -59,17 +54,16 @@ struct AllGatherMatmulV2TilingTestParam {
     ge::DataType pertoken_scale_dtype;
     ge::DataType comm_quant_scale_1_dtype;
     ge::DataType comm_quant_scale_2_dtype;
-    ge::DataType output_dtype; // 输出信息
+    ge::DataType output_dtype;
 
     bool is_trans_a;
     bool is_trans_b;
 
-    // 结果
-    bool expectSuccess; // 是否期望 tiling 成功
+    bool expectSuccess;
     uint64_t expectTilingKey;
 };
 
-class AllGatherMatmulV2TilingParam : public ::testing::TestWithParam<AllGatherMatmulV2TilingTestParam> {
+class AllGatherMatmulV2TilingParam : public ::testing::TestWithParam<AllGatherMatmulTilingTestParam> {
 protected:
     static void SetUpTestCase()
     {
@@ -90,12 +84,11 @@ gert::StorageShape make_shape(const std::initializer_list<int64_t> &input_shape)
     return gert::StorageShape{input_shape, input_shape};
 }
 
-void TestOneParamCase(const AllGatherMatmulV2TilingTestParam &param)
+void TestOneParamCase(const AllGatherMatmulTilingTestParam &param)
 {
-    struct AllGatherMatmulV2CompileInfo {};
-    AllGatherMatmulV2CompileInfo compileInfo;
+    struct AllGatherMatmulCompileInfo {};
+    AllGatherMatmulCompileInfo compileInfo;
 
-    // 存取用户输入的用例信息
     std::vector<std::pair<std::initializer_list<int64_t>, ge::DataType>> shapeDtypeList = {
         {param.x1_shape, param.x1_dtype},
         {param.x2_shape, param.x2_dtype},
@@ -109,7 +102,6 @@ void TestOneParamCase(const AllGatherMatmulV2TilingTestParam &param)
         {param.comm_quant_scale_2_shape, param.comm_quant_scale_2_dtype}
     };
 
-    // 按需提取后传入构造
     std::vector<gert::TilingContextPara::TensorDescription> inputList;
     for (uint64_t i = 0; i < param.inputTotalNum; ++i) {
         inputList.push_back({make_shape(shapeDtypeList[i].first), shapeDtypeList[i].second, ge::FORMAT_ND});
@@ -130,25 +122,23 @@ void TestOneParamCase(const AllGatherMatmulV2TilingTestParam &param)
             {"rank_size", build_from<int64_t>(0)},
             {"block_size", build_from<int64_t>(0)},
             {"group_size", build_from<int64_t>(0)},
-            {"is_gather_out", build_from<bool>(true)},
-            {"is_amax_out", build_from<bool>(false)},
+            {"is_gather_out", build_from<int64_t>(0)},
+            {"is_amax_out", build_from<int64_t>(0)},
             {"y_dtype", build_from<int64_t>(0)},
-            {"comm_mode", build_from<std::string>("")},
         },
-        &compileInfo, param.soc_version, param.compile_info, param.tilingDataSize);
+        &compileInfo, param.soc_version, param.coreNum, param.ubSize, param.tilingDataSize, param.compile_info);
 
+    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
     if (!param.expectSuccess) {
-        Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
         Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_FAILED, 0);
     } else {
-        Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
         Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_SUCCESS, param.expectTilingKey);
     }
 }
 
 const std::string COMPILE_INFO = R"({"hardware_info": {"BT_SIZE": 0, "load3d_constraints": "1", "Intrinsic_fix_pipe_l0c2out": false, "Intrinsic_data_move_l12ub": true, "Intrinsic_data_move_l0c2ub": true, "Intrinsic_data_move_out2l1_nd2nz": false, "UB_SIZE": 196608, "L2_SIZE": 33554432, "L1_SIZE": 524288, "L0A_SIZE": 65536, "L0B_SIZE": 65536, "L0C_SIZE": 131072, "CORE_NUM": 20, "socVersion": "Ascend910_95"}})";
 
-AllGatherMatmulV2TilingTestParam cases_params[] = {
+AllGatherMatmulTilingTestParam cases_params[] = {
     {3, "all_gather_matmul_v2_test_tiling_float16_1", COMPILE_INFO, "Ascend910_95", 20, 196608, 4096,
         {512, 12288}, {12288, 3904}, {}, {}, {}, {}, {}, {}, {}, {},
         {512, 3904}, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_STRING,
@@ -188,18 +178,15 @@ AllGatherMatmulV2TilingTestParam cases_params[] = {
 
 TEST_P(AllGatherMatmulV2TilingParam, general_case)
 {
-    if (!IsOpImplRegistryAvailable()) {
-        GTEST_SKIP() << "Skip test: OpImplSpaceRegistryV2 is null on host.";
-    }
-    const auto &param = GetParam();
+const auto &param = GetParam();
     TestOneParamCase(param);
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    general_cases_params,
+    general_cases_params_v2,
     AllGatherMatmulV2TilingParam,
     ::testing::ValuesIn(cases_params),
-    [](const ::testing::TestParamInfo<AllGatherMatmulV2TilingTestParam> &info) {
+    [](const ::testing::TestParamInfo<AllGatherMatmulTilingTestParam> &info) {
         std::string name = info.param.case_name;
         for (char &c : name) {
             if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') {
@@ -212,3 +199,5 @@ INSTANTIATE_TEST_SUITE_P(
 } // anonymous namespace
 
 } // namespace AllGatherMatmulV2UT
+
+

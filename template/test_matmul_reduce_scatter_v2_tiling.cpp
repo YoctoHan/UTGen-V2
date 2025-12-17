@@ -14,56 +14,41 @@
 #include "mc2_tiling_case_executor.h"
 
 namespace MatmulReduceScatterV2UT {
+
+namespace {
+
 template <typename T>
-auto build_from(const T& value){
+auto build_from(const T &value)
+{
     return Ops::Transformer::AnyValue::CreateFrom<T>(value);
 }
 
-// 定义用例信息结构体
 struct MatmulReduceScatterV2TilingTestParam {
-    // 平台信息
     uint64_t inputTotalNum;
-    string case_name;
-    string compile_info;
-    string soc_version;
+    std::string case_name;
+    std::string soc_version;
     uint64_t coreNum;
     uint64_t ubSize;
     uint64_t tilingDataSize;
+    std::string compile_info;
 
-    // 输入信息shape
     std::initializer_list<int64_t> x1_shape;
     std::initializer_list<int64_t> x2_shape;
-    std::initializer_list<int64_t> bias_shape;
-    std::initializer_list<int64_t> x3_shape;
-    std::initializer_list<int64_t> antiquant_scale_shape;
-    std::initializer_list<int64_t> antiquant_offset_shape;
-    std::initializer_list<int64_t> dequant_scale_shape;
-    std::initializer_list<int64_t> pertoken_scale_shape;
-    std::initializer_list<int64_t> comm_quant_scale_1_shape;
-    std::initializer_list<int64_t> comm_quant_scale_2_shape;
-    std::initializer_list<int64_t> output_shape; // 输出信息
 
-    // 输入信息类型
+    std::initializer_list<int64_t> y_shape;
+
     ge::DataType x1_dtype;
     ge::DataType x2_dtype;
-    ge::DataType bias_dtype;
-    ge::DataType x3_dtype;
-    ge::DataType antiquant_scale_dtype;
-    ge::DataType antiquant_offset_dtype;
-    ge::DataType dequant_scale_dtype;
-    ge::DataType pertoken_scale_dtype;
-    ge::DataType comm_quant_scale_1_dtype;
-    ge::DataType comm_quant_scale_2_dtype;
-    ge::DataType output_dtype; // 输出信息
+    ge::DataType y_dtype;
 
     bool is_trans_a;
     bool is_trans_b;
 
-    // 结果
     uint64_t expectTilingKey;
 };
 
-class MatmulReduceScatterV2TilingParam : public ::testing::TestWithParam<MatmulReduceScatterV2TilingTestParam> {
+class MatmulReduceScatterV2TilingParam
+    : public ::testing::TestWithParam<MatmulReduceScatterV2TilingTestParam> {
 protected:
     static void SetUpTestCase()
     {
@@ -76,43 +61,36 @@ protected:
     }
 };
 
-gert::StorageShape make_shape(const std::initializer_list<int64_t>& input_shape){
-    if (input_shape.size() == 0){
+gert::StorageShape make_shape(const std::initializer_list<int64_t> &input_shape)
+{
+    if (input_shape.size() == 0) {
         return gert::StorageShape{};
     }
     return gert::StorageShape{input_shape, input_shape};
 }
 
-void TestOneParamCase(const MatmulReduceScatterV2TilingTestParam& param){
+void TestOneParamCase(const MatmulReduceScatterV2TilingTestParam &param)
+{
     struct MatmulReduceScatterV2CompileInfo {};
     MatmulReduceScatterV2CompileInfo compileInfo;
 
-    // 存取用户输入的用例信息
-    std::vector<pair<std::initializer_list<int64_t>, ge::DataType>> shapeDtypeList = {
-    {param.x1_shape, param.x1_dtype}, 
-    {param.x2_shape, param.x2_dtype}, 
-    {param.bias_shape, param.bias_dtype}, 
-    {param.x3_shape, param.x3_dtype}, 
-    {param.antiquant_scale_shape, param.antiquant_scale_dtype}, 
-    {param.antiquant_offset_shape, param.antiquant_offset_dtype}, 
-    {param.dequant_scale_shape, param.dequant_scale_dtype}, 
-    {param.pertoken_scale_shape, param.pertoken_scale_dtype}, 
-    {param.comm_quant_scale_1_shape, param.comm_quant_scale_1_dtype}, 
-    {param.comm_quant_scale_2_shape, param.comm_quant_scale_2_dtype}
+    std::vector<std::pair<std::initializer_list<int64_t>, ge::DataType>> shapeDtypeList = {
+        {param.x1_shape, param.x1_dtype},
+        {param.x2_shape, param.x2_dtype},
     };
 
-    // 按需提取后传入构造
     std::vector<gert::TilingContextPara::TensorDescription> inputList;
-    for (int i = 0; i < param.inputTotalNum; i++){
+    for (uint64_t i = 0; i < param.inputTotalNum; ++i) {
         inputList.push_back({make_shape(shapeDtypeList[i].first), shapeDtypeList[i].second, ge::FORMAT_ND});
     }
 
     std::vector<gert::TilingContextPara::TensorDescription> outputList = {
-        {{param.output_shape, param.output_shape}, param.output_dtype, ge::FORMAT_ND},
-        {make_shape(param.x1_shape), param.x1_dtype, ge::FORMAT_ND},
+        {make_shape(param.y_shape), param.y_dtype, ge::FORMAT_ND},
     };
 
-    gert::TilingContextPara tilingContextPara("MatmulReduceScatterV2", inputList, outputList,
+    gert::TilingContextPara tilingContextPara("MatmulReduceScatterV2",
+        inputList,
+        outputList,
         {
             {"group", build_from<std::string>("group")},
             {"reduce_op", build_from<std::string>("sum")},
@@ -123,27 +101,26 @@ void TestOneParamCase(const MatmulReduceScatterV2TilingTestParam& param){
             {"block_size", build_from<int64_t>(0)},
             {"group_size", build_from<int64_t>(0)},
             {"is_amax_out", build_from<bool>(false)},
-            {"y_dtype", build_from<int64_t>(0)},
-            {"comm_mode", build_from<std::string>("")}
+            {"y_dtype", build_from<int64_t>(static_cast<int64_t>(ge::DT_FLOAT16))},
+            {"comm_mode", build_from<std::string>("aicpu")},
         },
-        &compileInfo, param.soc_version, param.compile_info, param.tilingDataSize);
+        &compileInfo, param.soc_version, param.coreNum, param.ubSize, param.tilingDataSize, param.compile_info);
 
-    ExecuteTestCase(tilingContextPara, ge::GRAPH_SUCCESS, param.expectTilingKey);
+    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
+    Mc2ExecuteTestCase(tilingContextPara, hcomTopologyMockValues, ge::GRAPH_SUCCESS, param.expectTilingKey);
 }
 
 TEST_P(MatmulReduceScatterV2TilingParam, general_case)
 {
-    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
-    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().SetValues(hcomTopologyMockValues);
-
+    if (!IsOpImplRegistryAvailable()) {
+        GTEST_SKIP() << "Skip test: OpImplSpaceRegistryV2 is null on host.";
+    }
     const auto &param = GetParam();
     TestOneParamCase(param);
-
-    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().Reset();
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    general_cases_params,
+    general_cases_params_v2,
     MatmulReduceScatterV2TilingParam,
     ::testing::ValuesIn(cases_params),
     [](const ::testing::TestParamInfo<MatmulReduceScatterV2TilingTestParam> &info) {
@@ -156,4 +133,7 @@ INSTANTIATE_TEST_SUITE_P(
         return name;
     });
 
+} // anonymous namespace
+
 } // namespace MatmulReduceScatterV2UT
+

@@ -26,22 +26,18 @@ auto build_from(const T &value)
     return Ops::Transformer::AnyValue::CreateFrom<T>(value);
 }
 
-// 用例信息结构体
 struct AlltoAllAllGatherBmmTilingTestParam {
-    // 平台信息
     std::string case_name;
     std::string soc_version;
     uint64_t coreNum;
     uint64_t ubSize;
     uint64_t tilingDataSize;
 
-    // 输入 / 输出 shape & dtype
     std::vector<std::vector<int64_t>> input_shapes;
     std::vector<ge::DataType> input_dtypes;
     std::vector<int64_t> output_shape;
     ge::DataType output_dtype;
 
-    // Attr 信息
     std::string group_ep;
     std::string group_tp;
     int64_t ep_world_size;
@@ -52,11 +48,10 @@ struct AlltoAllAllGatherBmmTilingTestParam {
     bool output_y2_flag;
     bool output_y3_flag;
 
-    // 期望结果
     bool has_expect_tiling_key;
     uint64_t expect_tiling_key;
 };
-
+ 
 class AlltoAllAllGatherBmmTilingParam : public ::testing::TestWithParam<AlltoAllAllGatherBmmTilingTestParam> {
 protected:
     static void SetUpTestCase()
@@ -72,17 +67,17 @@ protected:
 
 gert::StorageShape make_shape(const std::vector<int64_t> &input_shape)
 {
-    gert::StorageShape storage_shape;
-    if (input_shape.empty()) {
-        return storage_shape;
-    }
-    auto &origin_shape = storage_shape.MutableOriginShape();
-    auto &runtime_shape = storage_shape.MutableStorageShape();
-    for (auto dim : input_shape) {
-        origin_shape.AppendDim(dim);
-        runtime_shape.AppendDim(dim);
-    }
-    return storage_shape;
+   gert::StorageShape storage_shape;
+   if (input_shape.empty()) {
+       return storage_shape;
+   }
+   auto &origin_shape = storage_shape.MutableOriginShape();
+   auto &runtime_shape = storage_shape.MutableStorageShape();
+   for (auto dim : input_shape) {
+       origin_shape.AppendDim(dim);
+       runtime_shape.AppendDim(dim);
+   }
+   return storage_shape;
 }
 
 void TestOneParamCase(const AlltoAllAllGatherBmmTilingTestParam &param)
@@ -128,7 +123,6 @@ void TestOneParamCase(const AlltoAllAllGatherBmmTilingTestParam &param)
     }
 }
 
-// 用例列表
 AlltoAllAllGatherBmmTilingTestParam cases_params[] = {
     {"all_to_all_all_gather_batch_matmul_test_tiling_float16_1", "Ascend910_93", 20, 196608, 4096, {{16, 128, 64}, {4, 64, 128}}, {ge::DT_FLOAT16, ge::DT_FLOAT16}, {4, 512, 64}, ge::DT_FLOAT16, "ep_group", "tp_group", 4, 2, 1, 0, false, false, false, true, 0xDE0B6B3A7640001},
     {"all_to_all_all_gather_batch_matmul_test_tiling_float16_xshard_0", "Ascend910_93", 20, 196608, 4096, {{16, 256, 32}, {4, 64, 128}}, {ge::DT_FLOAT16, ge::DT_FLOAT16}, {4, 512, 64}, ge::DT_FLOAT16, "ep_group", "tp_group", 4, 2, 0, 0, false, false, false, true, 0xDE0B6B3A7640000},
@@ -167,17 +161,8 @@ AlltoAllAllGatherBmmTilingTestParam cases_params[] = {
 
 TEST_P(AlltoAllAllGatherBmmTilingParam, general_case)
 {
-    if (!IsOpImplRegistryAvailable()) {
-        GTEST_SKIP() << "Skip test: OpImplSpaceRegistryV2 is null on host.";
-    }
-
-    Mc2Hcom::MockValues hcomTopologyMockValues{{"rankNum", 8}};
-    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().SetValues(hcomTopologyMockValues);
-
     const auto &param = GetParam();
     TestOneParamCase(param);
-
-    Mc2Hcom::MC2HcomTopologyMocker::GetInstance().Reset();
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -197,3 +182,4 @@ INSTANTIATE_TEST_SUITE_P(
 } // anonymous namespace
 
 } // namespace AlltoAllAllGatherBatchMatMulUT
+

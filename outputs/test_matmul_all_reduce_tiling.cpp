@@ -19,9 +19,7 @@ auto build_from(const T& value){
     return Ops::Transformer::AnyValue::CreateFrom<T>(value);
 }
 
-// 定义用例信息结构体
 struct MatmulAllReduceTilingTestParam {
-    // 平台信息
     uint64_t inputTotalNum;
     string case_name;
     string compile_info;
@@ -30,7 +28,6 @@ struct MatmulAllReduceTilingTestParam {
     uint64_t ubSize;
     uint64_t tilingDataSize;
 
-    // 输入信息shape
     std::initializer_list<int64_t> x1_shape;
     std::initializer_list<int64_t> x2_shape;
     std::initializer_list<int64_t> bias_shape;
@@ -41,9 +38,8 @@ struct MatmulAllReduceTilingTestParam {
     std::initializer_list<int64_t> pertoken_scale_shape;
     std::initializer_list<int64_t> comm_quant_scale_1_shape;
     std::initializer_list<int64_t> comm_quant_scale_2_shape;
-    std::initializer_list<int64_t> output_shape; // 输出信息
+    std::initializer_list<int64_t> output_shape;
 
-    // 输入信息类型
     ge::DataType x1_dtype;
     ge::DataType x2_dtype;
     ge::DataType bias_dtype;
@@ -54,12 +50,11 @@ struct MatmulAllReduceTilingTestParam {
     ge::DataType pertoken_scale_dtype;
     ge::DataType comm_quant_scale_1_dtype;
     ge::DataType comm_quant_scale_2_dtype;
-    ge::DataType output_dtype; // 输出信息
+    ge::DataType output_dtype;
 
     bool is_trans_a;
     bool is_trans_b;
 
-    // 结果
     uint64_t expectTilingKey;
 };
 
@@ -87,7 +82,6 @@ void TestOneParamCase(const MatmulAllReduceTilingTestParam& param){
     struct MatmulAllReduceCompileInfo {};
     MatmulAllReduceCompileInfo compileInfo;
 
-    // 存取用户输入的用例信息
     std::vector<pair<std::initializer_list<int64_t>, ge::DataType>> shapeDtypeList = {
     {param.x1_shape, param.x1_dtype}, 
     {param.x2_shape, param.x2_dtype}, 
@@ -101,7 +95,6 @@ void TestOneParamCase(const MatmulAllReduceTilingTestParam& param){
     {param.comm_quant_scale_2_shape, param.comm_quant_scale_2_dtype}
     };
 
-    // 按需提取后传入构造
     std::vector<gert::TilingContextPara::TensorDescription> inputList;
     for (int i = 0; i < param.inputTotalNum; i++){
         inputList.push_back({make_shape(shapeDtypeList[i].first), shapeDtypeList[i].second, ge::FORMAT_ND});

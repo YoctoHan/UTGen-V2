@@ -1,31 +1,35 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This program is free software, you can redistribute it and/or modify.
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This file is a part of the CANN Open Software.
+ * Licensed under CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #include <iostream>
-#include <vector>
-#include <string>
+#include <thread>
+#include <cctype>
 #include <gtest/gtest.h>
 #include "mc2_tiling_case_executor.h"
 
-namespace MoeDistributeCombineUT {
-namespace {
-template <typename T>
-auto build_from(const T &value) { return Ops::Transformer::AnyValue::CreateFrom<T>(value); }
+namespace MoeDistributeDispatchUT {
 
-gert::StorageShape make_shape(const std::initializer_list<int64_t> &input_shape)
+namespace {
+
+template <typename T>
+auto build_from(const T &value)
 {
-    if (input_shape.size() == 0) { return gert::StorageShape{}; }
-    return gert::StorageShape{input_shape, input_shape};
+    return Ops::Transformer::AnyValue::CreateFrom<T>(value);
 }
 
 struct MoeDistributeCombineTilingTestParam {
-    // 平台信息
     std::string case_name;
     std::string soc_version;
     uint64_t coreNum;
     uint64_t ubSize;
 
-    // 输入 shape
     std::initializer_list<int64_t> input0_shape;
     std::initializer_list<int64_t> input1_shape;
     std::initializer_list<int64_t> input2_shape;
@@ -33,10 +37,8 @@ struct MoeDistributeCombineTilingTestParam {
     std::initializer_list<int64_t> input4_shape;
     std::initializer_list<int64_t> input5_shape;
 
-    // 输出 shape
     std::initializer_list<int64_t> output_shape;
 
-    // 输入 dtype
     ge::DataType input0_dtype;
     ge::DataType input1_dtype;
     ge::DataType input2_dtype;
@@ -44,10 +46,8 @@ struct MoeDistributeCombineTilingTestParam {
     ge::DataType input4_dtype;
     ge::DataType input5_dtype;
 
-    // 输出 dtype
     ge::DataType output_dtype;
 
-    // 属性
     std::string ep_group;
     std::string tp_group;
     int64_t ep_world_size;
@@ -63,20 +63,35 @@ struct MoeDistributeCombineTilingTestParam {
     int64_t comm_quant_mode;
     int64_t group_list_type;
 
-    // 期望 tiling key
     bool has_expect_tiling_key;
     uint64_t expect_tiling_key;
 };
 
+gert::StorageShape make_shape(const std::initializer_list<int64_t> &shape)
+{
+    if (shape.size() == 0) {
+        return gert::StorageShape{};
+    }
+    return gert::StorageShape{shape, shape};
+}
+
 class MoeDistributeCombineTilingParam : public ::testing::TestWithParam<MoeDistributeCombineTilingTestParam> {
 protected:
-    static void SetUpTestCase() { std::cout << "SetUp" << std::endl; }
-    static void TearDownTestCase() { std::cout << "TearDown" << std::endl; }
+    static void SetUpTestCase()
+    {
+        std::cout << "MoeDistributeCombineTiling SetUp" << std::endl;
+    }
+
+    static void TearDownTestCase()
+    {
+        std::cout << "MoeDistributeCombineTiling TearDown" << std::endl;
+    }
 };
 
 void TestOneParamCase(const MoeDistributeCombineTilingTestParam &param)
 {
-    struct MoeDistributeCombineCompileInfo {} compileInfo;
+    struct MoeDistributeCombineCompileInfo {};
+    MoeDistributeCombineCompileInfo compileInfo;
 
     std::vector<gert::TilingContextPara::TensorDescription> inputList = {
         {make_shape(param.input0_shape), param.input0_dtype, ge::FORMAT_ND},
@@ -136,7 +151,7 @@ MoeDistributeCombineTilingTestParam cases_params[] = {
 
 TEST_P(MoeDistributeCombineTilingParam, general_case)
 {
-    const auto &param = GetParam();
+const auto &param = GetParam();
     TestOneParamCase(param);
 }
 
@@ -146,8 +161,14 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(cases_params),
     [](const ::testing::TestParamInfo<MoeDistributeCombineTilingTestParam> &info) {
         std::string name = info.param.case_name;
-        for (char &c : name) { if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') c = '_'; }
+        for (char &c : name) {
+            if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') {
+                c = '_';
+            }
+        }
         return name;
     });
+
 } // anonymous namespace
-} // namespace MoeDistributeCombineUT
+
+} // namespace MoeDistributeDispatchUT
